@@ -5,7 +5,6 @@ create table default_fields (
 );
 
 create table company (
-    id       SERIAL primary key,
     name     varchar(255) not null,
     email    varchar(255),
     website  varchar(255),
@@ -13,9 +12,9 @@ create table company (
     country  varchar(255),
     size     int
 ) inherits (default_fields);
+alter table company add primary key (id);
 
 create table person (
-    id         SERIAL primary key,
     company_id int references company(id),
     first_name varchar(255) not null,
     last_name  varchar(255) not null,
@@ -23,22 +22,22 @@ create table person (
     phone      varchar(50),
     country    varchar(255)
 ) inherits (default_fields);
+alter table person add primary key (id);
 
 create table contact (
-    id         SERIAL primary key
 --    lead_id    int references lead(id)
 ) inherits (person);
+alter table contact add primary key (id);
 
 create table lead (
-    id         SERIAL primary key,
     contact_id int references contact(id) not null,
     source     varchar(255),
     role       varchar(255)
 ) inherits (person);
+alter table lead add primary key (id);
 alter table contact add column lead_id int references lead(id);
 
 create table opportunity (
-	id			  SERIAL primary key,
     name          varchar(255) not null,
     subject       varchar(255),
     lead_id       int references lead(id),
@@ -50,19 +49,20 @@ create table opportunity (
     budget_min    currency CHECK ((budget_min).amount >= 0),
     budget_max    currency CHECK ((budget_max).amount >= (budget_min).amount)
 ) inherits (default_fields);
+alter table opportunity add primary key (id);
 
 create table contract (
-    id             SERIAL primary key,
     opportunity_id int references opportunity(id) not null,
     amount         currency check ((amount).amount >= 0)
 ) inherits (default_fields);
+alter table contract add primary key (id);
 
 create table skill (
-    id          SERIAL primary key,
     name        varchar(255) unique not null,
     category    varchar(255),
     description text
 ) inherits (default_fields);
+alter table skill add primary key (id);
 
 create table person_skill (
     person_id         int references person(id) not null,
@@ -79,13 +79,12 @@ create table opportunity_skill (
 ) inherits (default_fields);
 
 CREATE TABLE invoice (
-    id          SERIAL primary key,
-    value	    currency check ((value).amount >= 0),
+    value       currency check ((value).amount >= 0),
     contract_id int references contract(id) not null
 ) inherits (default_fields);
+alter table invoice add primary key (id);
 
 create table activity (
-    id             SERIAL primary key,
     name           varchar(255) not null,
     person_id      int references person(id) not null,
     opportunity_id int references opportunity(id),
@@ -95,14 +94,14 @@ create table activity (
     description    varchar(1000),
     status         activity_status DEFAULT 'new'
 ) inherits (default_fields);
-create table event (
-    id          SERIAL primary key
-) inherits (activity);
-create table task (
-    id          SERIAL primary key
-) inherits (activity);
+alter table activity add primary key (id);
+
+create table event () inherits (activity);
+alter table event add primary key (id);
+create table task () inherits (activity);
+alter table task add primary key (id);
 
 create table expense (
-    id          SERIAL primary key,
     value currency check ((value).amount >= 0)
 ) inherits (default_fields);
+alter table expense add primary key (id);
